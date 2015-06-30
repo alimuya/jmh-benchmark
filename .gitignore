@@ -1,10 +1,13 @@
 *.class
+/bin
+/dist
+/result
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
 # Package Files #
-*.jar
+
 *.war
 *.ear
 
