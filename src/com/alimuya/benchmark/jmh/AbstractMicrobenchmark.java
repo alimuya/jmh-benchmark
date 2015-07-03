@@ -39,24 +39,26 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @BenchmarkMode(Mode.All)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 public abstract class AbstractMicrobenchmark {
-    protected static final int DEFAULT_WARMUP_ITERATIONS = 20;
-    protected static final int DEFAULT_MEASURE_ITERATIONS = 20;
-    protected static final int DEFAULT_FORKS = 5;
- 
+    protected static final int DEFAULT_WARMUP_ITERATIONS = 10;
+    protected static final int DEFAULT_MEASURE_ITERATIONS = 10;
+    protected static final int DEFAULT_FORKS = 2;
+    
     protected static final String[] JVM_ARGS = {
-        "-server","-Xms768m", "-Xmx768m",
-        "-XX:MaxDirectMemorySize=768m", "-XX:+AggressiveOpts", "-XX:+UseBiasedLocking",
-        "-XX:+UseFastAccessorMethods", "-XX:+OptimizeStringConcat",
-        "-XX:+HeapDumpOnOutOfMemoryError",
+        "-server",
     };
- 
+    
+    
+    protected abstract String baseLineMethodName();
+//    "-Xms768m", "-Xmx768m",
+//    "-XX:MaxDirectMemorySize=768m", "-XX:+AggressiveOpts", "-XX:+UseBiasedLocking",
+//    "-XX:+UseFastAccessorMethods", "-XX:+OptimizeStringConcat",
+//    "-XX:+HeapDumpOnOutOfMemoryError",
     @Test
     public void run() throws Exception {
         String className = getClass().getSimpleName();
         ChainedOptionsBuilder runnerOptions = new OptionsBuilder()
             .include(".*" + className + ".*")
             .resultFormat(ResultFormatType.JSON)
-            .threads(Runtime.getRuntime().availableProcessors())
             .result(filePath())
             .jvmArgs(JVM_ARGS);
         Collection<RunResult> results = new Runner(runnerOptions.build()).run();
@@ -83,14 +85,25 @@ public abstract class AbstractMicrobenchmark {
     
     private Map<String,Long> getcharMap(Collection<RunResult> results){
     	Map<String,Long> map=new HashMap<String,Long>();
-    	 for (RunResult result :results) {
+    	long baselineValue=0;
+    	String baseLineMethod=this.baseLineMethodName();
+    	for (RunResult result :results) {
  			Result<?> tmp = result.getPrimaryResult();
  			String key=tmp.getLabel();
  			double score=tmp.getScore();
- 			BigDecimal   b   =   new   BigDecimal(score);  
- 			long value   = (long)((b.setScale(5,   BigDecimal.ROUND_HALF_UP).doubleValue())*100000);
- 			map.put(key, value);
+			BigDecimal b = new BigDecimal(score);
+			long value = (long) ((b.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue()) * 1000);
+			if (key.equals(baseLineMethod)) {
+				baselineValue=value;
+ 			}else{
+ 				map.put(key, value);
+ 			}
  		}
+    	if(baselineValue>0){
+    		for (String key:map.keySet()) {
+				map.put(key, map.get(key)-baselineValue);
+			}
+    	}
     	return map;
     }
     
