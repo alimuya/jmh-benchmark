@@ -16,6 +16,7 @@ import com.alimuya.kevvy.reflect.KevvyMethodReflect;
  * @author ov_alimuya
  *
  */
+@BenchmarkMode(Mode.SingleShotTime)
 public class MethodAccessBenchmark extends AbstractMicrobenchmark {
 	
 	private Method javaVoidNoParameter;
@@ -59,81 +60,79 @@ public class MethodAccessBenchmark extends AbstractMicrobenchmark {
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyVoidNoParameter()throws Exception {
 		return kevvyVoidNoParameter.invoke(bean);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyPrivateVoidNoParameter()throws Exception {
 		return  kevvyPrivateVoidNoParameter.invoke(bean);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object javaVoidNoParameter()throws Exception {
 		return javaVoidNoParameter.invoke(bean);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyVoidParameters()throws Exception {
 		return kevvyVoidParameters.invoke(bean,"vv","ov","alimuya",3.14,1);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyPrivateVoidParameters()throws Exception {
 		return kevvyPrivateVoidParameters.invoke(bean,"vv","ov","alimuya",3.14,1);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object javaVoidParameters()throws Exception {
 		return javaVoidParameters.invoke(bean,"vv","ov","alimuya",3.14,1);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyReturnNoParameter()throws Exception {
 		return kevvyReturnNoParameter.invoke(bean);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyPrivateReturnNoParameter()throws Exception {
 		return kevvyPrivateReturnNoParameter.invoke(bean);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object javaReturnNoParameter()throws Exception {
 		return javaReturnNoParameter.invoke(bean);
 	}
 	
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyReturnParameters()throws Exception {
 		return kevvyReturnParameters.invoke(bean,"vv","ov","alimuya",3.14,1);
 	}
 	
 
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object kevvyPrivateReturnParameters()throws Exception {
 		return kevvyPrivateReturnParameters.invoke(bean,"vv","ov","alimuya",3.14,1);
 	}
 
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public Object javaReturnParameters()throws Exception {
 		return javaReturnParameters.invoke(bean,"vv","ov","alimuya",3.14,1);
 	}
-
+	
+	@Benchmark
+	public Object baseline(){
+		return bean;
+	}
+	
 	@Override
 	protected String benchmarkName() {
 		return "Kevvy Method Reflect Benchmark";
+	}
+
+	@Override
+	protected String baseLineMethodName() {
+		return "baseline";
 	}
 }

@@ -20,6 +20,7 @@ import com.alimuya.kevvy.reflect.exception.InvokeTargetException;
  * @author ov_alimuya
  *
  */
+@BenchmarkMode(Mode.AverageTime)
 public class ConstructorAccessBenchmark extends AbstractMicrobenchmark {
 	private KevvyConstructorReflect<BenchmarkConstructorBean> kevvyReflect;
 	private KevvyConstructor<BenchmarkConstructorBean> kevvyNoParameter;
@@ -27,10 +28,12 @@ public class ConstructorAccessBenchmark extends AbstractMicrobenchmark {
 	private Constructor<BenchmarkConstructorBean> javaNoParameter;
 	private Constructor<BenchmarkConstructorBean> javaParameters;
 	private Class<BenchmarkConstructorBean> type;
+	private BenchmarkConstructorBean bean;
 
 	@Setup
 	public void init() throws NoSuchMethodException, SecurityException{
 		this.type = BenchmarkConstructorBean.class;
+		this.bean=new BenchmarkConstructorBean();
 		this.kevvyReflect = KevvyConstructorReflect.createConstructor(type);
 		this. kevvyNoParameter = kevvyReflect.getConstructor();
 		this. kevvyParameters = kevvyReflect.getConstructor(String.class, String.class,String.class,double.class,int.class);
@@ -40,40 +43,44 @@ public class ConstructorAccessBenchmark extends AbstractMicrobenchmark {
 	
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public BenchmarkConstructorBean kevvyNoParameter() throws ConstructorReflectException, InvokeTargetException{
 		return kevvyNoParameter.newInstance();
 	}
 	
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public BenchmarkConstructorBean javaNoParameter() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		return javaNoParameter.newInstance();
 	}
 	
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public BenchmarkConstructorBean kevvyParameters() throws ConstructorReflectException, InvokeTargetException{
 		return kevvyParameters.newInstance("vv","ov","alimuya",3.14,1);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public BenchmarkConstructorBean javaParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		return javaParameters.newInstance("vv","ov","alimuya",3.14,1);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public BenchmarkConstructorBean kevvyInstanceWithoutConstructor() throws ConstructorReflectException{
 		return KevvyConstructorReflect.newInstanceWithoutConstructor(type);
 	}
 
-
+	@Benchmark
+	public BenchmarkConstructorBean baseline() throws ConstructorReflectException{
+		return this.bean;
+	}
+	
 	@Override
 	protected String benchmarkName() {
 		return "Kevvy Constructor Reflect Benchmark";
+	}
+
+	@Override
+	protected String baseLineMethodName() {
+		return "baseline";
 	}
 }

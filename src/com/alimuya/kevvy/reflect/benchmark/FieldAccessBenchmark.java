@@ -17,6 +17,7 @@ import com.alimuya.kevvy.reflect.exception.FieldReflectException;
  * @author ov_alimuya
  *
  */
+@BenchmarkMode(Mode.AverageTime)
 public class FieldAccessBenchmark extends AbstractMicrobenchmark {
 	
 	private KevvyField kevvyPublicField;
@@ -38,7 +39,6 @@ public class FieldAccessBenchmark extends AbstractMicrobenchmark {
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public String javaReflectField() throws IllegalArgumentException, IllegalAccessException{
 		javaField.set(testFieldBean, testString);
 		return (String) javaField.get(testFieldBean);
@@ -46,14 +46,12 @@ public class FieldAccessBenchmark extends AbstractMicrobenchmark {
 	
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public String javaGetterSetterField(){
 		testFieldBean.setGsField(testString);
 		return testFieldBean.getGsField();
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public String kevvyPublicField() throws FieldReflectException{
 		kevvyPublicField.setObject(testFieldBean, testString);
 		return (String) kevvyPublicField.get(testFieldBean);
@@ -61,21 +59,29 @@ public class FieldAccessBenchmark extends AbstractMicrobenchmark {
 	
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public String kevvyPrivateField() throws FieldReflectException{
 		kevvyPrivateField.setObject(testFieldBean, testString);
 		return (String) kevvyPrivateField.get(testFieldBean);
 	}
 	
 	@Benchmark
-	@BenchmarkMode(Mode.AverageTime)
 	public String kevvyGetterSetterField() throws FieldReflectException{
 		kevvyGSField.setObject(testFieldBean, testString);
 		return (String) kevvyGSField.get(testFieldBean);
 	}
-
+	
+	@Benchmark
+	public String baseline(){
+		return testString;
+	}
+	
 	@Override
 	protected String benchmarkName() {
 		return "Kevvy Field Reflect Benchmark";
+	}
+
+	@Override
+	protected String baseLineMethodName() {
+		return "baseline";
 	}
 }
